@@ -85,7 +85,7 @@ Object.entries(devices).forEach(([key]) => {
   });
 });
 
-app.get("/client", basicAuth, (_req, res) => {
+app.get("/client", (_req, res) => {
   const filePath = path.resolve(__dirname, "./public/client.html");
   const file = fs.readFileSync(filePath, 'utf8')
     .replace("{{host_name}}", process.env.HOST_NAME)
