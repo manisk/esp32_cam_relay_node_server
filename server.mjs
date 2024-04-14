@@ -1,11 +1,13 @@
 import path, { dirname } from 'path';
 import express from 'express';
+import fs from 'fs';
 import { WebSocketServer } from 'ws';
 import { fileURLToPath } from 'url';
+import * as dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
+dotenv.config()
 
 const app = express();
 
@@ -13,9 +15,9 @@ app.use("/static", express.static(path.join(__dirname, "public")));
 
 let clients = [];
 
-const HTTP_PORT = 8000;
+const HTTP_PORT = process.env.HTTP_PORT;
 let devices = {
-  relay_module1: { port: 8888 },
+  cam1: { port: process.env.CAM_SOCKET_PORT1 },
 };
 
 process.on("uncaughtException", (error, origin) => {
@@ -27,12 +29,12 @@ process.on("uncaughtException", (error, origin) => {
 });
 
 // Clients
-const ws = new WebSocketServer({ port: "8999" }, () => {
+const ws = new WebSocketServer({ port: process.env.CLIENT_SOCKET_PORT }, () => {
   console.log(`WS Server is listening at 8999`);
 });
 
-ws.on("connection", (ws) => {
-  console.log("connection request recieved: " + ws);
+ws.on("connection", (ws, request) => {
+  console.log("connection request recieved for port " + process.env.CLIENT_SOCKET_PORT + " at " + new Date());
   ws.on('error', console.error);
   ws.on("message", (data) => {
     if (ws.readyState !== ws.OPEN) return;
@@ -86,7 +88,12 @@ Object.entries(devices).forEach(([key]) => {
 });
 
 app.get("/client", (_req, res) => {
-  res.sendFile(path.resolve(__dirname, "./public/client.html"));
+  const filePath = path.resolve(__dirname, "./public/client.html");
+  const file = fs.readFileSync(filePath, 'utf8')
+    .replace("{{host_name}}", process.env.HOST_NAME)
+    .replace("{{client_socket_port}}", process.env.CLIENT_SOCKET_PORT)
+    .replace("{{web_socket_protocol}}", process.env.WEBSOCKET_PROTOCOL);
+  res.send(file);
 });
 app.listen(HTTP_PORT, () => {
   console.log(`HTTP server starting on ${HTTP_PORT}`);
