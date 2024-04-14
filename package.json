@@ -4,13 +4,15 @@
   "main": "server.js",
   "dependencies": {
     "express": "^4.18.2",
+    "ip": "^2.0.1",
     "path": "^0.12.7",
-    "ws": "^7.5.7"
+    "serverless-http": "^3.2.0",
+    "ws": "^8.16.*"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "pm2 start server.js",
-    "start": "node server.js"
+    "deploy": "pm2 start server.mjs",
+    "start": "node server.mjs"
   },
   "author": "Nomadic Geek",
   "license": "ISC",
