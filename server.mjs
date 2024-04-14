@@ -56,14 +56,12 @@ ws.on("connection", (ws, request) => {
 // Devices
 Object.entries(devices).forEach(([key]) => {
   const device = devices[key];
-
   new WebSocketServer({ port: device.port }, () =>
     console.log(`WS Server is listening at ${device.port}`)
   ).on("connection", (ws) => {
     console.log("connection request recieved: " + ws);
     ws.on("message", (data) => {
       if (ws.readyState !== ws.OPEN) return;
-
       if (device.command) {
         ws.send(device.command);
         device.command = null; // Consume
