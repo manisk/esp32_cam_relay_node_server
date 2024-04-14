@@ -1,6 +1,4 @@
-const ws = new WebSocket(
-  `${web_socket_protocol}://${host_name}:${client_socket_port}`
-);
+const ws = new WebSocket(`${web_socket_protocol}://${host_name}/ws`);
 
 ws.addEventListener("open", (event) => {
   ws.send(
