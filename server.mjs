@@ -85,7 +85,7 @@ Object.entries(devices).forEach(([key]) => {
   });
 });
 
-app.get("/client", (_req, res) => {
+app.get("/client", basicAuth, (_req, res) => {
   const filePath = path.resolve(__dirname, "./public/client.html");
   const file = fs.readFileSync(filePath, 'utf8')
     .replace("{{host_name}}", process.env.HOST_NAME)
@@ -93,6 +93,26 @@ app.get("/client", (_req, res) => {
     .replace("{{web_socket_protocol}}", process.env.WEBSOCKET_PROTOCOL);
   res.send(file);
 });
+
 app.listen(HTTP_PORT, () => {
   console.log(`HTTP server starting on ${HTTP_PORT}`);
 });
+
+
+function basicAuth(req, res, next) {
+  const auth = { login: process.env.UNAME, password: process.env.PWD } // change this
+  // parse login and password from headers
+  const b64auth = (req.headers.authorization || '').split(' ')[1] || ''
+  const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':')
+
+  // Verify login and password are set and correct
+  if (login && password && login === auth.login && password === auth.password) {
+    // Access granted...
+    return next()
+  }
+
+  // Access denied...
+  res.set('WWW-Authenticate', 'Basic realm="401"') // change this
+  res.status(401).send('Authentication required.') // custom message
+  // -----------------------------------------------------------------------
+}
