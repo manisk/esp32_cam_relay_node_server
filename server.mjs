@@ -1,7 +1,6 @@
 import path, { dirname } from 'path';
 import express from 'express';
 import { WebSocketServer } from 'ws';
-import ip from 'ip';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -9,7 +8,6 @@ const __dirname = dirname(__filename);
 
 
 const app = express();
-const ipAddress = ip.address();
 
 app.use("/static", express.static(path.join(__dirname, "public")));
 
@@ -92,5 +90,4 @@ app.get("/client", (_req, res) => {
 });
 app.listen(HTTP_PORT, () => {
   console.log(`HTTP server starting on ${HTTP_PORT}`);
-  console.log(`Network access via: ${ipAddress}:${HTTP_PORT}`);
 });
